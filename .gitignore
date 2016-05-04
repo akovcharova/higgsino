@@ -36,6 +36,7 @@ bin/*
 *.tex
 *.aux
 *.txt
+!txt/plot_styles.txt
 gmon.out
 out
 archive
