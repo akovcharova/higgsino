@@ -51,7 +51,7 @@ public:
   TString title, titlex, titley, varname, varnamex, varnamey, tag, cuts, unit;
   int nbins, nbinsx, nbinsy;
   float *binning;
-  float minx, maxx, miny, maxy, cut, cutx, cuty,  maxYaxis, maxRatio;
+  float minx, maxx, miny, maxy, cut, cut2, cutx, cuty,  maxYaxis, maxRatio;
   std::vector<int> samples;
   TString tagname;
   void format_tag();
@@ -118,6 +118,7 @@ void plot_2D_distributions(std::vector<sfeats> Samples, std::vector<hfeats> vars
 TString cuts2title(TString title);
 TString cuts2tex(TString cuts);
 TString invertcut(TString cut);
+TString cleanCut(TString cut);
 TString format_tag(TString tag);
 double gsl_ran_gamma (const double a, const double b, TRandom3 &rand);
 double intGaus(double mean, double sigma, double minX, double maxX);

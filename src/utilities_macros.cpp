@@ -111,7 +111,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
     leg[ileg].SetFillStyle(0); leg[ileg].SetBorderSize(0);
     leg[ileg].SetTextFont(style.nFont); 
   }
-  TLine line; line.SetLineColor(28); line.SetLineWidth(5); line.SetLineStyle(3);
+  TLine line; line.SetLineColor(1); line.SetLineWidth(5); line.SetLineStyle(3);
   vector< vector<TH1D*> > histo[2];
   vector<TH1D*> varhisto;
   vector<float> nentries;
@@ -256,7 +256,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
 	err_tot = num/den*sqrt(pow(err_num/num,2)+pow(err_den/den,2));
 	//cout<<"Histogram [MC] is ("<<RoundNumber((den/num-1)*100,1)
 	//    <<" +- "<<RoundNumber(err_tot*100,1)<<")% larger than markers [data]"<<endl; 
-	norm_s = "("+RoundNumber((num/den)*100,1)+"#pm"+RoundNumber(err_tot*100,1)+")%";
+	norm_s = ", ("+RoundNumber((num/den)*100,1)+"#pm"+RoundNumber(err_tot*100,1)+")%";
 	cout<<"Markers [data] are ("<<RoundNumber((num/den)*100,1)
 	    <<" +- "<<RoundNumber(err_tot*100,1)<<")% the histogram [MC]. Data yield is "<<num<<endl;
       }
@@ -338,6 +338,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       if (!doRatio) style.moveYAxisLabel(histo[0][var][firstplotted], maxpadLog, true);
       histo[0][var][firstplotted]->Draw("axis same");
       if(vars[var].cut>0) line.DrawLine(vars[var].cut, 0, vars[var].cut, maxhisto);
+      if(vars[var].cut2>0) line.DrawLine(vars[var].cut2, 0, vars[var].cut2, maxhisto);
 
       //ratio
       TH1D* hratio_data(NULL);
@@ -397,7 +398,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       //label lumi
       pad->cd();
       if(!namestyle.Contains("CMSPaper") || showcuts) {
-	TString lumilbl = TString::Format("%1.1f",luminosity.Atof())+" fb^{-1}, "+norm_s;
+	TString lumilbl = TString::Format("%1.1f",luminosity.Atof())+" fb^{-1}"+norm_s;
 	TLatex llbl;
 	llbl.SetTextSize(style.LegendSize*0.8); 
 	llbl.SetNDC(); llbl.SetTextAlign(33);
@@ -485,6 +486,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
     } // Loop over samples
     for(int ileg(0); ileg<nLegs; ileg++) leg[ileg].Draw(); 
     if(vars[var].cut>0) line.DrawLine(vars[var].cut, 0, vars[var].cut, maxhisto);
+    if(vars[var].cut2>0) line.DrawLine(vars[var].cut2, 0, vars[var].cut2, maxhisto);
 
     // Setting Y-axis for shapes plot (non-log)
     float minhisto(0), maxpad(minhisto + (maxhisto-minhisto)/(1-fracLeg));
@@ -703,9 +705,9 @@ TString cuts2title(TString title){
   title.ReplaceAll("ntks","N_{tks}");
   title.ReplaceAll("mj", " M_{J}");
   title.ReplaceAll("hig_dm", "#Deltam");
-  title.ReplaceAll("hig_am", "#bar{m}");
+  title.ReplaceAll("hig_am", "#bar{m}_{bb}");
   title.ReplaceAll("hig_drmax", "#DeltaR_{max}");
-  title.ReplaceAll("!low_dphi", "low #Delta#phi");
+  title.ReplaceAll("!low_dphi", "high #Delta#phi");
   
   title.ReplaceAll("el_tks_mt", "Track m_{T}"); title.ReplaceAll("mu_tks_mt", "Track m_{T}"); title.ReplaceAll("had_tks_mt", "Track m_{T}");
   title.ReplaceAll("el_tks_pt", "Track p_{T}"); title.ReplaceAll("mu_tks_pt", "Track p_{T}"); title.ReplaceAll("had_tks_pt", "Track p_{T}");
@@ -763,6 +765,11 @@ TString invertcut(TString cut){ //For only one cut
 
   return cut;
 }
+TString cleanCut(TString cut){ 
+  while(cut.Length() && cut[0]=='&')
+    cut.Remove(0,1);
+  return cut;
+}
 
 pfeats::pfeats(const vector<int> &isamples, const TString &icut, const TString &itagname):
   samples(isamples),
@@ -785,6 +792,7 @@ hfeats::hfeats(TString ivarname, int inbins, float iminx, float imaxx, vector<in
   unit = "";
   maxYaxis = -1.;
   maxRatio = -1.;
+  cut2 = -1;
   skiplog=iskiplog;
   if(inevents.at(0)<0) nevents = vector<double>(isamples.size(),-1);
   else nevents = inevents;
@@ -793,13 +801,15 @@ hfeats::hfeats(TString ivarname, int inbins, float iminx, float imaxx, vector<in
   normalize=false;
   PU_reweight=false;
   moveRLegend = 0;
-  
+  cuts = cleanCut(cuts);
+
   string ctitle(title.Data()); // Needed because effing TString can't handle square brackets
   if(!(ctitle.find("GeV")==std::string::npos)) unit = "GeV";
   if(!(ctitle.find("Number")==std::string::npos)) unit = "";
   if(!(ctitle.find("phi")==std::string::npos)) unit = "rad";
   }
-hfeats::hfeats(TString ivarnamex, TString ivarnamey, int inbinsx, float iminx, float imaxx, int inbinsy, float iminy, float imaxy,  vector<int> isamples,
+hfeats::hfeats(TString ivarnamex, TString ivarnamey, int inbinsx, float iminx, float imaxx, int inbinsy, float iminy, 
+	       float imaxy,  vector<int> isamples,
                TString ititlex, TString ititley, TString icuts, float icutx, float icuty, TString itagname):
   titlex(ititlex),
   titley(ititley),
@@ -820,8 +830,10 @@ hfeats::hfeats(TString ivarnamex, TString ivarnamey, int inbinsx, float iminx, f
   unit = "";
   maxYaxis = -1.;
   maxRatio = -1.;
+  cut2 = -1;
   PU_reweight=false;
   addOverflow = true;
+  cuts = cleanCut(cuts);
 
   string ctitle(title.Data()); // Needed because effing TString can't handle square brackets
   if(!(ctitle.find("GeV")==std::string::npos)) unit = "GeV";
@@ -844,6 +856,7 @@ hfeats::hfeats(TString ivarname, int inbins, float *ibinning, vector<int> isampl
   unit = "";
   maxYaxis = -1.;
   maxRatio = -1.;
+  cut2 = -1;
   skiplog =iskiplog;
   if(inevents.at(0)<0) nevents = vector<double>(isamples.size(),-1);
   else nevents = inevents;
@@ -851,6 +864,8 @@ hfeats::hfeats(TString ivarname, int inbins, float *ibinning, vector<int> isampl
   whichPlots = "0"; // Make all 4 [log_]lumi and [log_]shapes plots; For 2D: 1=linear, 2=log
   PU_reweight=false;
   addOverflow = true;
+  cuts = cleanCut(cuts);
+
   string ctitle(title.Data()); // Needed because effing TString can't handle square brackets
   if(!(ctitle.find("GeV")==std::string::npos)) unit = "GeV";
   if(!(ctitle.find("Number")==std::string::npos)) unit = "";
