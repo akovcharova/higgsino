@@ -135,7 +135,8 @@ bool onecut::pass(baby_base *baby){
   case kAlwaysFalse:
     return false;
   case kBool:
-    return (baby->*bb_)();
+    if (compType_==kNotEqual) return !(baby->*bb_)();
+    else return (baby->*bb_)();
   case kvBool:
     return (baby->*bvb_)()[ivector_];
   case kFloat:
@@ -193,7 +194,15 @@ void onecut::parseCut(TString cut){
     compType_ = cTypes[ind];
     break;    
   } // Loop over comparison types
-  if(pos == -1) assignBranch(var, val); // Assigning boolean branches
+  if(pos == -1) {
+    if (var.Contains("!")) {
+      compType_ = kNotEqual;
+      var.ReplaceAll("!","");
+    } else {
+      compType_ = kEqual;
+    }
+    assignBranch(var, val); // Assigning boolean branches
+  }
 }
 
 void onecut::assignBranch(TString var, TString val){
@@ -242,9 +251,24 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="mj"){
     cutType_ = kFloat;
     bf_ = &baby_base::mj;
+  }else if(var=="hig_dm"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::hig_dm;
+  }else if(var=="hig_am"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::hig_am;
+  }else if(var=="hig_drmax"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::hig_drmax;
+  }else if(var=="hig_bin"){
+    cutType_ = kInt;
+    bi_ = &baby_base::hig_bin;
   }else if(var=="nleps"){
     cutType_ = kInt;
     bi_ = &baby_base::nleps;
+  }else if(var=="nvleps"){
+    cutType_ = kInt;
+    bi_ = &baby_base::nvleps;
   }else if(var=="nvels"){
     cutType_ = kInt;
     bi_ = &baby_base::nvels;
@@ -260,6 +284,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="ntruleps"){
     cutType_ = kInt;
     bi_ = &baby_base::ntruleps;
+  }else if(var=="ntks"){
+    cutType_ = kInt;
+    bi_ = &baby_base::ntks;
   }else if(var=="njets"){
     cutType_ = kInt;
     bi_ = &baby_base::njets;
@@ -272,9 +299,18 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="run"){
     cutType_ = kInt;
     bi_ = &baby_base::run;
+  }else if(var=="nbt"){
+    cutType_ = kInt;
+    bi_ = &baby_base::nbt;
   }else if(var=="nbm"){
     cutType_ = kInt;
     bi_ = &baby_base::nbm;
+  }else if(var=="nbl"){
+    cutType_ = kInt;
+    bi_ = &baby_base::nbl;
+  }else if(var=="low_dphi"){
+    cutType_ = kBool;
+    bb_ = &baby_base::low_dphi;
   }else if(var=="pass"){
     cutType_ = kBool;
     bb_ = &baby_base::pass;
