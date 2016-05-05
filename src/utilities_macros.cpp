@@ -644,15 +644,15 @@ TString cuts2title(TString title){
   title.ReplaceAll("Sum$(abs(mc_id)==13)","n^{true}_{#mu}");
   title.ReplaceAll("Sum$(genels_pt>0)", "n^{true}_{e}");
   title.ReplaceAll("Sum$(genmus_pt>0)", "n^{true}_{#mu}");
-  title.ReplaceAll("Sum$(mus_sigid&&mus_miniso<0.2)","n_{#mu}^{10}");
-  title.ReplaceAll("Sum$(els_sigid&&els_miniso<0.1)","n_{e}^{10}");
+  title.ReplaceAll("Sum$(mus_sigid&&mus_miniso<0.2)","N_{#mu}^{10}");
+  title.ReplaceAll("Sum$(els_sigid&&els_miniso<0.1)","N_{e}^{10}");
   title.ReplaceAll("nvmus==1&&nmus==1&&nvels==0","1 #mu");
   title.ReplaceAll("nvmus10==0&&nvels10==0", "0 leptons");  
-  title.ReplaceAll("(nmus+nels)", "n_{lep}");  
-  title.ReplaceAll("(nels+nmus)", "n_{lep}");  
+  title.ReplaceAll("(nmus+nels)", "N_{lep}");  
+  title.ReplaceAll("(nels+nmus)", "N_{lep}");  
   title.ReplaceAll("(nvmus+nvels)", "n^{veto}_{lep}");  
-  title.ReplaceAll("nvmus==2&&nmus>=1","n_{#mu}#geq1, n^{veto}_{#mu}=2");
-  title.ReplaceAll("nvels==2&&nels>=1","n_{e}#geq1, n^{veto}_{e}=2");
+  title.ReplaceAll("nvmus==2&&nmus>=1","N_{#mu}#geq1, n^{veto}_{#mu}=2");
+  title.ReplaceAll("nvels==2&&nels>=1","N_{e}#geq1, n^{veto}_{e}=2");
   title.ReplaceAll("(nvmus>=2||nvels>=2)","n^{veto}_{lep} #geq 2"); 
   title.ReplaceAll("(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))>80&&(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))<100", 
 		   "80<m_{ll}<100");  
@@ -662,34 +662,34 @@ TString cuts2title(TString title){
 		   "80<m_{ll}<100");  
   title.ReplaceAll("onht>350&&onmet>100&&","");
   title.ReplaceAll("jets_islep[0]==0","");
-  title.ReplaceAll("(nels==0&&nmus==1)","n_{#mu}=1");
-  title.ReplaceAll("(nels==1&&nmus==0)","n_{#font[12]{e}}=1");
+  title.ReplaceAll("(nels==0&&nmus==1)","N_{#mu}=1");
+  title.ReplaceAll("(nels==1&&nmus==0)","N_{#font[12]{e}}=1");
   title.ReplaceAll("Max$(abs(els_eta)*(els_sigid&&els_miniso<0.1&&els_pt>20))<1.479","barrel #font[12]{e}");
   title.ReplaceAll("Max$(abs(els_eta)*(els_sigid&&els_miniso<0.1&&els_pt>20))>1.479","endcap #font[12]{e}");
 
 
-  title.ReplaceAll("nleps", "n_{l}");
-  title.ReplaceAll("nvleps", "n_{l}");
-  title.ReplaceAll("nmus", "n_{#mu}");  
-  title.ReplaceAll("nels", "n_{e}");  
+  title.ReplaceAll("nleps", "N_{l}");
+  title.ReplaceAll("nvleps", "N_{l}");
+  title.ReplaceAll("nmus", "N_{#mu}");  
+  title.ReplaceAll("nels", "N_{e}");  
   title.ReplaceAll("nvmus", "n^{veto}_{#mu}");  
   title.ReplaceAll("nvels", "n^{veto}_{e}");  
   title.ReplaceAll("ntruleps", "n^{true}_{l}");
   title.ReplaceAll("_ra2b", "^{ra2b}");
-  title.ReplaceAll("npv", "n_{PV}");  
+  title.ReplaceAll("npv", "N_{PV}");  
   title.ReplaceAll("mumu_pt1", "p_{T}^{#mu}");  title.ReplaceAll("elel_pt1", "p_{T}^{e}");  
 
   title.ReplaceAll("abs(mc_id)==1000006", "stop"); title.ReplaceAll("abs(mc_id)==1000022", "LSP");
 
   title.ReplaceAll("onmet", "MET^{on}"); title.ReplaceAll("onht", "H_{T}^{on}");  
-  title.ReplaceAll("njets30","n_{jets}^{30}"); 
+  title.ReplaceAll("njets30","N_{jets}^{30}"); 
   title.ReplaceAll("els_pt","p^{e}_{T}"); title.ReplaceAll("mus_pt","p^{#mu}_{T}");
-  title.ReplaceAll("fjets_nconst","n_{const}^{fat jet}");
+  title.ReplaceAll("fjets_nconst","N_{const}^{fat jet}");
   title.ReplaceAll("fjets_30_m[0]","m(J_{1})"); title.ReplaceAll("fjets_m[0]","m(J_{1})");
   title.ReplaceAll("(fjets_pt*cosh(fjets_eta))","p_{fatjet}"); title.ReplaceAll("fjets_pt","p^{fatjet}_{T}"); title.ReplaceAll("jets_pt","p^{jet}_{T}");
   title.ReplaceAll("mus_reliso","RelIso"); title.ReplaceAll("els_reliso","RelIso");
   title.ReplaceAll("mus_miniso_tr15","MiniIso"); title.ReplaceAll("els_miniso_tr15","MiniIso");
-  title.ReplaceAll("njets","n_{jets}");title.ReplaceAll("abs(lep_id)==13&&","");
+  title.ReplaceAll("njets","N_{jets}");title.ReplaceAll("abs(lep_id)==13&&","");
   title.ReplaceAll(">=", " #geq "); title.ReplaceAll(">", " > "); 
   title.ReplaceAll("<=", " #leq "); title.ReplaceAll("<", " < "); 
   title.ReplaceAll("&&", ", "); title.ReplaceAll("==", " = "); 
@@ -697,9 +697,15 @@ TString cuts2title(TString title){
   title.ReplaceAll("mht", "MHT");  
   title.ReplaceAll("ht", "H_{T}");  title.ReplaceAll("mt", "m_{T}"); 
   title.ReplaceAll("ntks_chg==0", " ITV");
-  title.ReplaceAll("nbm","n_{b}"); 
-  title.ReplaceAll("nbl","n_{b,l}");
+  title.ReplaceAll("nbm","N_{b,M}"); 
+  title.ReplaceAll("nbl","N_{b,L}");
+  title.ReplaceAll("nbt","N_{b,T}");
+  title.ReplaceAll("ntks","N_{tks}");
   title.ReplaceAll("mj", " M_{J}");
+  title.ReplaceAll("hig_dm", "#Deltam");
+  title.ReplaceAll("hig_am", "#bar{m}");
+  title.ReplaceAll("hig_drmax", "#DeltaR_{max}");
+  title.ReplaceAll("!low_dphi", "low #Delta#phi");
   
   title.ReplaceAll("el_tks_mt", "Track m_{T}"); title.ReplaceAll("mu_tks_mt", "Track m_{T}"); title.ReplaceAll("had_tks_mt", "Track m_{T}");
   title.ReplaceAll("el_tks_pt", "Track p_{T}"); title.ReplaceAll("mu_tks_pt", "Track p_{T}"); title.ReplaceAll("had_tks_pt", "Track p_{T}");
@@ -733,10 +739,10 @@ TString cuts2tex(TString cuts){
   cuts.ReplaceAll("mumuv_pt", "p^{\\mu\\mu}_T"); 
   cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht_clean", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
   cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
-  cuts.ReplaceAll("njets_ra2", "n_j");  cuts.ReplaceAll("njets_clean", "n_j");  cuts.ReplaceAll("njets", "n_j");  
-  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
-  cuts.ReplaceAll("nvels", "n_e"); cuts.ReplaceAll("nels", "n_e");  
-  cuts.ReplaceAll("nvmus", "n_\\mu"); cuts.ReplaceAll("nmus", "n_\\mu");  
+  cuts.ReplaceAll("njets_ra2", "N_j");  cuts.ReplaceAll("njets_clean", "N_j");  cuts.ReplaceAll("njets", "N_j");  
+  cuts.ReplaceAll("nbm", "N_b");  cuts.ReplaceAll("nleps", "N_{\\ell}"); 
+  cuts.ReplaceAll("nvels", "N_e"); cuts.ReplaceAll("nels", "N_e");  
+  cuts.ReplaceAll("nvmus", "N_\\mu"); cuts.ReplaceAll("nmus", "N_\\mu");  
   cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
   cuts.ReplaceAll("pass_jets","\\text{JetID}"); cuts.ReplaceAll("pass_ra2, ","");cuts.ReplaceAll("pass, ","");
   cuts.ReplaceAll("pass","\\text{all filters}");
@@ -1109,28 +1115,25 @@ void dump_event(baby_full &tree, int entry){
   // }
 }
 
-namespace  ra4 {
+namespace ra2b{
   TColor ucsb_blue(2000, 1/255.,57/255.,166/255.);
   TColor ucsb_gold(2001, 255/255.,200/255.,47/255);
-  TColor penn_red(2002, 149/255.,0/255.,26/255.);
+  //TColor penn_red(2002, 149/255.,0/255.,26/255.);
+  TColor penn_red(2002, 160/255.,0/255.,26/255.);
   TColor uf_orange(2003, 255/255.,74/255.,0/255.);
-  TColor uo_green(2004, 0/255.,79/255.,39/255.);
-  TColor tcu_purple(2005, 52/255.,42/255.,123/255.);
+  //TColor uo_green(2004, 0/255.,79/255.,39/255.);
+  TColor uo_green(2004, 0/255.,140/255.,90/255.);
+  //TColor tcu_purple(2005, 52/255.,42/255.,123/255.);
+  TColor tcu_purple(2005, 100/255.,66/255.,176/255.);
   TColor tar_heel_blue(2006, 86/255.,160/255.,211/255.);
   TColor sig_teal(2007, 96/255.,159/255.,128/255.);
   TColor sig_gold(2008, 215/255.,162/255.,50/255.);
   TColor seal_brown(2010, 89/255.,38/255.,11/255.);
-}
-
-namespace dps{
   TColor light_blue(2011, 153/255.,220/255.,255/255.);
   TColor med_blue(2012, 1/255.,148/255.,218/255.);
   TColor red(2015, 250/255.,96/255.,1/255.);
   TColor skype_green(2018,9/255.,186/255.,1/255.);
-  // TColor purple(2019, 172/255.,46/255.,135/255.);
   TColor purple(2019, 183/255.,66/255.,176/255.);
-  TColor ucsb_gold(2020, 255/255.,200/255.,47/255);
-
 }
 
 double intGaus(double mean, double sigma, double minX, double maxX){
