@@ -38,6 +38,7 @@ int main(){
 
   //// Defining samples, i.e. columns in the table
   TString folder="/cms27r0/babymaker/2016_04_29/mc/merged_met100nb2nj4nl0/";
+  // TString folder="/cms27r0/babymaker/2016_04_29/mc/merged_higloose/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms2"+folder;
 
@@ -52,61 +53,84 @@ int main(){
   vector<TString> s_other;
   s_other.push_back(folder+"*DYJetsToLL*");
   s_other.push_back(folder+"*_WWTo*");
-  s_other.push_back(folder+"*ttHJetTobb*");
   s_other.push_back(folder+"*_TTTT*");
   s_other.push_back(folder+"*_WZ*.root");
 
   vector<TString> s_qcd;
   s_qcd.push_back(folder+"*_QCD_HT*");
-  s_qcd.push_back(folder+"*_TTJets_TuneCUET*");
-  vector<TString> s_wjets;
-  s_wjets.push_back(folder+"*_WJetsToLNu*");
-  vector<TString> s_zjets;
-  s_zjets.push_back(folder+"*_ZJetsToNuNu*");
-  vector<TString> s_single;
-  s_single.push_back(folder+"*_ST_*");
-  vector<TString> s_ttv;
-  s_ttv.push_back(folder+"*_TTWJets*");
-  s_ttv.push_back(folder+"*_TTZTo*");
-  s_ttv.push_back(folder+"*_TTG*");
+  // s_qcd.push_back(folder+"*_TTJets_TuneCUET*");
+  vector<TString> s_vjets;
+  s_vjets.push_back(folder+"*_WJetsToLNu*");
+  s_vjets.push_back(folder+"*_ZJetsToNuNu*");
+  vector<TString> s_tx;
+  s_tx.push_back(folder+"*_TTWJets*");
+  s_tx.push_back(folder+"*_TTZTo*");
+  s_tx.push_back(folder+"*_TTG*");
+  s_tx.push_back(folder+"*ttHJetTobb*");
+  s_tx.push_back(folder+"*_ST_*");
+
  
   vector<sfeats> Samples; 
   Samples.push_back(sfeats(s_other, "Other", 1001,1,"stitch"));
   Samples.push_back(sfeats(s_qcd, "QCD", 1002, 1,"ntruleps==0"));
-  Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
-  Samples.push_back(sfeats(s_single, "Single $t$", 1005));
-  Samples.push_back(sfeats(s_wjets, "W+jets", 1004));
-  Samples.push_back(sfeats(s_zjets, "Z+jets", 1004));
-  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "ntruleps==1"));
-  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"ntruleps==2"));
+  Samples.push_back(sfeats(s_tx, "$t\\bar{t}X$, single $t$", 1002));
+  // Samples.push_back(sfeats(s_single, "Single $t$", 1005));
+  Samples.push_back(sfeats(s_vjets, "W/Z+jets", 1004));
+  // Samples.push_back(sfeats(s_zjets, "Z+jets", 1004));
+  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "stitch&&ntruleps==1"));
+  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"stitch&&ntruleps==2"));
   Samples.push_back(sfeats(s_tchi400, "TChiHH 400", 2));Samples.back().isSig = true;
   // Samples.push_back(sfeats(s_tchi200, "TChiHH 200", 2,2));
 
   //// tables has a vector of the tables you want to print
   vector<tfeats> tables;
-  TString baseline_s("stitch&&pass"); 
+  TString baseline_s("pass"); 
+
+  // TString cut2b="nbt==2&&nbm==2", cut3b="nbt>=2&&nbm==3&&nbl==3", cut4b="nbt>=2&&nbm>=3&&nbl>=4";
+  TString met0cut="&&met>250&&met<=300", met1cut="&&met>300";
+  TString sigcut="hig_am>100&&hig_am<140&&hig_dm<40";//, sbdcut="!("+sigcut+")";
+
   //////////// Standard cutflow ////////////
   // Pushing first table and adding rows
-  TString skim("met>100 && nbm>=2 && njets>=4 && nvleps==0&&");
+  TString skim("met>250 && nbm>=2 && njets>=4 && nvleps==0&&"); //apply track veto
+  // TString skim("met>100 && nbm>=2 && njets>=4 && nvleps==0&&");
   tables.push_back(tfeats("1", "an"));
-  tables.back().add("MET $>100$, 2 $b_{M}$, 4 jets, lep. veto", skim);
-  tables.back().add("$\\Delta\\phi_{min}$", skim+"!low_dphi");
-  tables.back().add("$N_{\\rm jets}\\leq 5$", skim+"!low_dphi && njets<=5","-");
+  tables.back().add("MET $>250$, 2M b-tags, 4 jets, 0$\\ell$", skim);
+  tables.back().add("Iso track veto", skim+" ntks==0");
+  tables.back().add("$\\Delta\\phi_{min}$", skim+"ntks==0&&!low_dphi");
+  tables.back().add("$N_{\\rm jets}\\leq 5$", skim+"ntks==0&&!low_dphi && njets<=5","-");
+  TString preseln(skim+"ntks==0&&!low_dphi && njets<=5 &&");
 
-  TString preseln(skim+"!low_dphi && njets<=5");
+  // TString preseln(skim+"njets<=5");
   tables.back().add("$\\Delta m_{jj}<40$ ", preseln+"hig_dm<40");
   tables.back().add("$\\left< m_{jj} \\right> \\in(100,140)$ ", preseln+"hig_dm<40 && hig_am>100 && hig_am<140");
   tables.back().add("$\\Delta R_{max} < 2.2$ ", preseln+"hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2","-");
-
-  // tables.back().add("Iso track veto", skim+" ntks==0");
-
   TString higcuts("hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2&&");
-  tables.back().add("$2T$", preseln+ higcuts +"nbt>=2");
-  tables.back().add("$2M$", preseln+ higcuts +"nbm>=2","-");
-  tables.back().add("$2T, 3M$", preseln+ higcuts +"nbt>=2&&nbm>=3");
-  tables.back().add("$3M$", preseln+ higcuts +"nbm>=3","-");
-  tables.back().add("$2T, 3M, 4L$", preseln+ higcuts +"nbt>=2&&nbm>=3&&nbl>=4");
-  tables.back().add("$4M$", preseln+ higcuts +"nbm>=4");
+
+  tables.back().add("$N_{b,M}=2$", preseln+ higcuts +"nbm==2","=");
+  tables.back().add("TMM,TML: $N_{b,T}=2, N_{b,M}=2$", preseln+ higcuts + "nbt==2&&nbm==2","b");
+  tables.back().add("TTL: $N_{b,T}=2$", preseln+ higcuts + "nbt==2","-");
+
+  tables.back().add("TMM: $N_{b,M}=3$", preseln+ higcuts +"nbm==3");
+  tables.back().add("TML: $N_{b,T}\\geq2, N_{b,M}=3, N_{b,L}=3$", preseln+ higcuts +"nbt>=2&&nbm==3&&nbl==3","b");
+  tables.back().add("TTL: $N_{b,T}=3, N_{b,L}=3$", preseln+ higcuts +"nbt==3&&nbl==3","-");
+
+  tables.back().add("TMM: $N_{b,M}\\geq4$", preseln+ higcuts +"nbm>=4");
+  tables.back().add("TML: $N_{b,T}\\geq2, N_{b,M}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=2&&nbm>=3&&nbl>=4","b");
+  tables.back().add("TTL: $N_{b,T}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=3&&nbl>=4");
+
+  higcuts +="met>300&&";
+  tables.back().add("MET$>$300, $N_{b,M}=2$", preseln+ higcuts +"nbm==2","=");
+  tables.back().add("MET$>$300, TMM,TML: $N_{b,T}=2, N_{b,M}=2$", preseln+ higcuts + "nbt==2&&nbm==2","r");
+  tables.back().add("MET$>$300, TTL: $N_{b,T}=2$", preseln+ higcuts + "nbt==2","-");
+
+  tables.back().add("MET$>$300, TMM: $N_{b,M}=3$", preseln+ higcuts +"nbm==3");
+  tables.back().add("MET$>$300, TML: $N_{b,T}\\geq2, N_{b,M}=3, N_{b,L}=3$", preseln+ higcuts +"nbt>=2&&nbm==3&&nbl==3","r");
+  tables.back().add("MET$>$300, TTL: $N_{b,T}=3, N_{b,L}=3$", preseln+ higcuts +"nbt==3&&nbl==3","-");
+
+  tables.back().add("MET$>$300, TMM: $N_{b,M}\\geq4$", preseln+ higcuts +"nbm>=4");
+  tables.back().add("MET$>$300, TML: $N_{b,T}\\geq2, N_{b,M}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=2&&nbm>=3&&nbl>=4","r");
+  tables.back().add("MET$>$300, TTL: $N_{b,T}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=3&&nbl>=4");
   // tables.back().add("\\geq2 b_{T}, \\geq3 b_{M}, ", preseln+ higcuts +"nbt>=2 && nbm>=3");
 
   /////////////////////////////  No more changes needed down here to add tables ///////////////////////
@@ -171,17 +195,17 @@ int main(){
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
     vector<vector<double> > entries, size_t ini) {
-  int nsig(0), digits(1);
+  int nsig(0), digits(2);
   for(unsigned sam(0); sam < Samples.size(); sam++) if(Samples[sam].isSig) nsig++;
 
-  bool do_uncert(true);
+  bool do_uncert(false);
   vector<double> av_w2(Samples.size()+1,0);
 
   TString outname = "txt/table_cutflow_"+table.tag+".tex";
   ofstream out(outname);
 
   out << "\\documentclass{article}\n";
-  out << "\\usepackage{amsmath,graphicx,rotating}\n";
+  out << "\\usepackage{amsmath,graphicx,rotating,color}\n";
   out << "\\usepackage[landscape]{geometry}\n";
   out << "\\thispagestyle{empty}\n";
   out << "\\begin{document}\n";
@@ -201,10 +225,14 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
     out << " & "<<Samples[sam].label;
   out << "\\\\ \\hline \n ";
   for(size_t icut(0); icut < table.tcuts.size(); icut++){
-    if(table.options[icut]=="=") do_uncert = true;
+    if(table.options[icut].Contains("=")) do_uncert = true;
     // if(icut==table.tcuts.size()-3) digits = 2;
     for(int ind(0); ind < table.options[icut].CountChar('='); ind++) out << " \\hline ";
-    out<<table.texnames[icut];
+    TString color_on(""), color_off("");
+    if (table.options[icut].Contains("b")) { color_on="\\textcolor{blue}{"; color_off="}"; }
+    else if (table.options[icut].Contains("r")) { color_on="\\textcolor{red}{"; color_off="}"; }
+    if (table.options[icut].Contains("e")) { color_on+="\\textbf{"; color_off+="}"; }
+    out<<color_on<<table.texnames[icut]<<color_off;
     double bkg(0), ebkg(0);
     for(unsigned sam(0); sam < Samples.size()-nsig; sam++) {
       double val(yields[sam][ini+icut]), errval(sqrt(w2[sam][ini+icut]));
@@ -212,15 +240,15 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
       else errval = sqrt(av_w2[sam]);
       bkg += val;
       ebkg += pow(errval, 2);
-      if(!do_uncert) out <<" & "<< RoundNumber(val,digits);
-      else out <<" & $"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
+      if(!do_uncert) out <<" & "+color_on<< RoundNumber(val,digits)<<color_off;
+      else out <<" & "+color_on+"$"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$"+color_off;
     } // Loop over background samples
-    if(!do_uncert) out <<" & "<< RoundNumber(bkg,digits);
-    else out <<" & $"<< RoundNumber(bkg,digits)<<"\\pm"<<RoundNumber(sqrt(ebkg),digits)<<"$";
+    if(!do_uncert) out <<" & "+color_on<< RoundNumber(bkg,digits)<<color_off;
+    else out <<" & "+color_on+"$"<< RoundNumber(bkg,digits)<<"\\pm"<<RoundNumber(sqrt(ebkg),digits)<<"$"+color_off;
     for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++){
       double val(yields[sam][ini+icut]), errval(sqrt(w2[sam][ini+icut]));
-      if(!do_uncert) out <<" & "<< RoundNumber(val,digits);
-      else out <<" & $"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
+      if(!do_uncert) out <<" & "+color_on<< RoundNumber(val,digits)<<color_off;
+      else out <<" & "+color_on+"$"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$"+color_off;
     }
     out<<" \\\\ ";
     for(int ind(0); ind < table.options[icut].CountChar('-'); ind++) out << " \\hline";
