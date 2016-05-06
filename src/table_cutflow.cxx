@@ -25,6 +25,7 @@
 using namespace std;
 namespace {
   TString luminosity = "20.";
+  TString nb_bins = "TML";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -86,52 +87,54 @@ int main(){
   vector<tfeats> tables;
   TString baseline_s("pass"); 
 
-  // TString cut2b="nbt==2&&nbm==2", cut3b="nbt>=2&&nbm==3&&nbl==3", cut4b="nbt>=2&&nbm>=3&&nbl>=4";
-  TString met0cut="&&met>250&&met<=300", met1cut="&&met>300";
-  TString sigcut="hig_am>100&&hig_am<140&&hig_dm<40";//, sbdcut="!("+sigcut+")";
+  TString cut2b="nbt==2&&nbm==2", cut3b="nbt>=2&&nbm==3&&nbl==3", cut4b="nbt>=2&&nbm>=3&&nbl>=4";
+  if(nb_bins=="TTL"){
+    cut2b = "nbt==2";
+    cut3b = "nbt==3&&nbl==3";
+    cut4b = "nbt==3&&nbl>=4";
+  }
+  if(nb_bins=="TMM"){
+    cut2b = "nbt==2&&nbm==2";
+    cut3b = "nbm==3";
+    cut4b = "nbm>=4";
+  }
+  TString met0cut="met>250&&met<=300&&", met1cut="met>300&&";
+  TString sigcut="hig_am>100&&hig_am<140&&hig_dm<40";
 
   //////////// Standard cutflow ////////////
-  // Pushing first table and adding rows
-  TString skim("met>250 && nbm>=2 && njets>=4 && nvleps==0&&"); //apply track veto
-  // TString skim("met>100 && nbm>=2 && njets>=4 && nvleps==0&&");
+  TString skim("met>150 && nbm>=2 && njets>=4 && nvleps==0&&"); 
   tables.push_back(tfeats("1", "an"));
-  tables.back().add("MET $>250$, 2M b-tags, 4 jets, 0$\\ell$", skim);
+  tables.back().add("MET $>150$, 2M b-tags, 4 jets, 0$\\ell$", skim);
   tables.back().add("Iso track veto", skim+" ntks==0");
   tables.back().add("$\\Delta\\phi_{min}$", skim+"ntks==0&&!low_dphi");
   tables.back().add("$N_{\\rm jets}\\leq 5$", skim+"ntks==0&&!low_dphi && njets<=5","-");
-  TString preseln(skim+"ntks==0&&!low_dphi && njets<=5 &&");
 
-  // TString preseln(skim+"njets<=5");
+  TString preseln(skim+"ntks==0&&!low_dphi && njets<=5 &&");
   tables.back().add("$\\Delta m_{jj}<40$ ", preseln+"hig_dm<40");
   tables.back().add("$\\left< m_{jj} \\right> \\in(100,140)$ ", preseln+"hig_dm<40 && hig_am>100 && hig_am<140");
   tables.back().add("$\\Delta R_{max} < 2.2$ ", preseln+"hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2","-");
-  TString higcuts("hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2&&");
+  TString higcuts("hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2 &&");
+  tables.back().add("$MET \\geq 250$", preseln+ higcuts +"met>250");
+  tables.back().add("$N_{b,T}\\geq2$", preseln+ higcuts +"met>250&&nbt>=2","-");
 
-  tables.back().add("$N_{b,M}=2$", preseln+ higcuts +"nbm==2","=");
-  tables.back().add("TMM,TML: $N_{b,T}=2, N_{b,M}=2$", preseln+ higcuts + "nbt==2&&nbm==2","b");
-  tables.back().add("TTL: $N_{b,T}=2$", preseln+ higcuts + "nbt==2","-");
+  tables.back().add("N-1, Iso track veto", skim + "met>250 && nbt>=2 &&" + "!low_dphi && njets<=5 && hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2","=");
+  tables.back().add("N-1, $\\Delta\\phi_{min}$", skim + "met>250 && nbt>=2 &&" + "ntks==0 && njets<=5 && hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2");
+  tables.back().add("N-1, $N_{\\rm jets}\\leq 5$", skim + "met>250 && nbt>=2 &&" + "ntks==0 && !low_dphi && hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2");
+  tables.back().add("N-1, $\\Delta m_{jj}<40$", skim + "met>250 && nbt>=2 &&" + "ntks==0 && !low_dphi && njets<=5 && hig_am>100 && hig_am<140 && hig_drmax<2.2");
+  tables.back().add("N-1, $\\left< m_{jj} \\right> \\in(100,140)$", skim + "met>250 && nbt>=2 &&" + "ntks==0 && !low_dphi && njets<=5 && hig_dm<40 && hig_drmax<2.2");
+  tables.back().add("N-1, $\\Delta R_{max} < 2.2$", skim + "met>250 && nbt>=2 &&" + "ntks==0 && !low_dphi && njets<=5 && hig_dm<40 && hig_am>100 && hig_am<140","--");
+  // tables.back().add("N-1, Iso track veto", skim + "met>250 && nbt>=2 &&" + "ntks==0 && !low_dphi && njets<=5 && hig_dm<40 && hig_am>100 && hig_am<140 && hig_drmax<2.2");
 
-  tables.back().add("TMM: $N_{b,M}=3$", preseln+ higcuts +"nbm==3");
-  tables.back().add("TML: $N_{b,T}\\geq2, N_{b,M}=3, N_{b,L}=3$", preseln+ higcuts +"nbt>=2&&nbm==3&&nbl==3","b");
-  tables.back().add("TTL: $N_{b,T}=3, N_{b,L}=3$", preseln+ higcuts +"nbt==3&&nbl==3","-");
+  //N-1 rows
 
-  tables.back().add("TMM: $N_{b,M}\\geq4$", preseln+ higcuts +"nbm>=4");
-  tables.back().add("TML: $N_{b,T}\\geq2, N_{b,M}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=2&&nbm>=3&&nbl>=4","b");
-  tables.back().add("TTL: $N_{b,T}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=3&&nbl>=4");
-
-  higcuts +="met>300&&";
-  tables.back().add("MET$>$300, $N_{b,M}=2$", preseln+ higcuts +"nbm==2","=");
-  tables.back().add("MET$>$300, TMM,TML: $N_{b,T}=2, N_{b,M}=2$", preseln+ higcuts + "nbt==2&&nbm==2","r");
-  tables.back().add("MET$>$300, TTL: $N_{b,T}=2$", preseln+ higcuts + "nbt==2","-");
-
-  tables.back().add("MET$>$300, TMM: $N_{b,M}=3$", preseln+ higcuts +"nbm==3");
-  tables.back().add("MET$>$300, TML: $N_{b,T}\\geq2, N_{b,M}=3, N_{b,L}=3$", preseln+ higcuts +"nbt>=2&&nbm==3&&nbl==3","r");
-  tables.back().add("MET$>$300, TTL: $N_{b,T}=3, N_{b,L}=3$", preseln+ higcuts +"nbt==3&&nbl==3","-");
-
-  tables.back().add("MET$>$300, TMM: $N_{b,M}\\geq4$", preseln+ higcuts +"nbm>=4");
-  tables.back().add("MET$>$300, TML: $N_{b,T}\\geq2, N_{b,M}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=2&&nbm>=3&&nbl>=4","r");
-  tables.back().add("MET$>$300, TTL: $N_{b,T}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts +"nbt>=3&&nbl>=4");
-  // tables.back().add("\\geq2 b_{T}, \\geq3 b_{M}, ", preseln+ higcuts +"nbt>=2 && nbm>=3");
+  tables.back().add("$MET \\in (250,300), N_{b,T}\\geq2$", preseln+ higcuts +met0cut + "nbt>=2","-");
+  tables.back().add("$MET \\in (250,300), N_{b,T}=2, N_{b,M}=2$", preseln+ higcuts + met0cut + cut2b);
+  tables.back().add("$MET \\in (250,300), N_{b,T}\\geq2, N_{b,M}=3, N_{b,L}=3$", preseln+ higcuts + met0cut + cut3b);
+  tables.back().add("$MET \\in (250,300), N_{b,T}\\geq2, N_{b,M}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts + met0cut + cut4b,"--");
+  tables.back().add("$MET>300, N_{b,T}\\geq2$", preseln+ higcuts +met1cut + "nbt>=2","-");
+  tables.back().add("$MET > 300, N_{b,T}=2, N_{b,M}=2$", preseln+ higcuts + met1cut + cut2b);
+  tables.back().add("$MET > 300, N_{b,T}\\geq2, N_{b,M}=3, N_{b,L}=3$", preseln+ higcuts + met1cut + cut3b);
+  tables.back().add("$MET > 300, N_{b,T}\\geq2, N_{b,M}\\geq3, N_{b,L}\\geq4$", preseln+ higcuts + met1cut + cut4b);
 
   /////////////////////////////  No more changes needed down here to add tables ///////////////////////
 
@@ -142,7 +145,7 @@ int main(){
     for(size_t icut(0); icut < tables[itab].tcuts.size(); icut++){
       bincuts.push_back(bcut(tables[itab].cuts+"&&"+tables[itab].tcuts[icut]));
     }
-    tables[itab].cuts = "ht>500&&met>200&&"+baseline_s + "&&" + tables[itab].cuts;
+    //tables[itab].cuts = "ht>500&&met>200&&"+baseline_s + "&&" + tables[itab].cuts;
   }
   //// Calculating yields per sample, all bins from all tables at a time
   vector<vector<double> > yields, w2, entries;
