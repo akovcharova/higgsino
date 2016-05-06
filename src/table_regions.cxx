@@ -36,7 +36,7 @@ int main(){
 
   //// Defining samples, i.e. columns in the table
   // TString folder="/cms27r0/babymaker/2016_04_29/mc/merged_met100nb2nj4nl0/";
-  TString folder="/cms27r0/babymaker/2016_04_29/mc/merged_higloose/";
+  TString folder="/cms2r0/babymaker/babies/2016_04_29/mc/merged_higloose/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms2"+folder;
 
@@ -90,7 +90,7 @@ int main(){
   TString sbdcut="sbd&&";
   TString cut2b="nbt==2&&nbm==2", cut3b="nbt>=2&&nbm==3&&nbl==3", cut4b="nbt>=2&&nbm>=3&&nbl>=4";
   
-  TString nb_bins = "MMM";
+  TString nb_bins = "TML";
   if(nb_bins=="TTL"){
     cut2b = "nbt==2";
     cut3b = "nbt==3&&nbl==3";
@@ -111,7 +111,7 @@ int main(){
   tables.back().add("low MET, SBD:4b", met0cut + sbdcut + cut4b,"+");
   tables.back().add("low MET, SIG:2b", met0cut + sigcut + cut2b);
   tables.back().add("low MET, SIG:3b", met0cut + sigcut + cut3b);
-  tables.back().add("low MET, SIG:4b", met0cut + sigcut + cut4b);
+  tables.back().add("low MET, SIG:4b", met0cut + sigcut + cut4b,"-");
   tables.back().add("high MET, SBD:2b", met1cut + sbdcut + cut2b,"+");
   tables.back().add("high MET, SBD:3b", met1cut + sbdcut + cut3b,"+");
   tables.back().add("high MET, SBD:4b", met1cut + sbdcut + cut4b,"+");
@@ -226,7 +226,7 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
       ebkg += pow(errval, 2);
       out <<" & "<< RoundNumber(val,digits);
     } // Loop over background samples
-    out<<" & "<<RoundNumber(bkg, digits)<<" $\\pm$ "<<RoundNumber(ebkg, digits);
+    out<<" & "<<RoundNumber(bkg, digits)<<" $\\pm$ "<<RoundNumber(sqrt(ebkg), digits);
     for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++){
       if (sbdhack)
         out <<" & "<< RoundNumber(yields[sam][ini+jcut]+yields[sam][ini+jcut+1]+yields[sam][ini+jcut+2],digits)<<
