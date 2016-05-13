@@ -26,10 +26,13 @@ int main(){
     bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
   
   TString folder(bfolder+"/cms2r0/babymaker/babies/2016_04_29/mc/merged_met100nb2nj4nl0/");
+  TString folder_ns(bfolder+"/cms2r0/babymaker/babies/2016_04_29/mc/unskimmed/");
 
 
   vector<TString> s_tchi;
   s_tchi.push_back(folder+"*TChiHH*mChi-400_*");
+  vector<TString> s_tchi_ns;
+  s_tchi_ns.push_back(folder_ns+"*TChiHH*mChi-400_*");
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets*HT*");
@@ -70,10 +73,26 @@ int main(){
     ra2b_sam.push_back(sam);
   } // Loop over samples
 
+  size_t ihig = Samples.size();
+  Samples.push_back(sfeats(s_tchi_ns, "True H_{1}", ra2b::c_tchi, 1, "1", "Max$(mc_pt*(mc_id==25))")); 
+  Samples.push_back(sfeats(s_tchi_ns, "True H_{2}", ra2b::c_tchi, 2, "1", "Min$(mc_pt*(mc_id==25)+99999*(mc_id!=25))")); 
+  Samples.push_back(sfeats(s_tchi_ns, "Reco H_{1}", 4, 1, "1", "max(hig1_pt, hig2_pt)")); 
+  Samples.push_back(sfeats(s_tchi_ns, "Reco H_{2}", 4, 2, "1", "min(hig1_pt, hig2_pt)")); 
+  vector<int> hig_sam;
+  for(unsigned sam(ihig); sam < Samples.size(); sam++){
+    hig_sam.push_back(sam);
+  } // Loop over samples
 
 
   vector<hfeats> vars;
 
+  //// Higgs pT
+  vars.push_back(hfeats("hig_pt",16,0,800,hig_sam, "Higgs p_{T} for TChiHH(400,1) [GeV]","njets>=4&&nbm>=4&&met<250",350));
+  vars.back().whichPlots = "3";  
+  vars.push_back(hfeats("hig_pt",16,0,800,hig_sam, "Higgs p_{T} for TChiHH(400,1) [GeV]","njets>=4&&nbm>=4&&met>250",350));
+  vars.back().whichPlots = "3";  
+
+  //// Sample to plot
   TString met_s = "himet", nb_s = "4b", tag = met_s+"_"+nb_s;
 
   //// Baseline
