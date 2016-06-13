@@ -135,9 +135,9 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
     for(unsigned his(0); his < 2; his++){
       varhisto.resize(0);
       for(unsigned sam(0); sam < Nsam; sam++){ 
-	if(Samples[vars[var].samples[sam]].doBand) someBands = true;
+        if(Samples[vars[var].samples[sam]].doBand) someBands = true;
         hname = "histo"; hname += var; hname += his; hname += sam;  
-	delete gROOT->FindObject(hname); // For some reason, the deletion at the end is not enough
+        delete gROOT->FindObject(hname); // For some reason, the deletion at the end is not enough
         if(variableBins) { 
           vars[var].minx = vars[var].binning[0];
           varhisto.push_back(new TH1D(hname, title, vars[var].nbins, vars[var].binning));
@@ -164,9 +164,9 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       if(samVariable=="noPlot") chain[isam]->Project(histo[0][var][sam]->GetName(), variable, totCut);
       else chain[isam]->Project(histo[0][var][sam]->GetName(), samVariable, totCut);
       if(vars[var].addOverflow) 
-	histo[0][var][sam]->SetBinContent(vars[var].nbins,
-					  histo[0][var][sam]->GetBinContent(vars[var].nbins)+
-					  histo[0][var][sam]->GetBinContent(vars[var].nbins+1));
+        histo[0][var][sam]->SetBinContent(vars[var].nbins,
+                                          histo[0][var][sam]->GetBinContent(vars[var].nbins)+
+                                          histo[0][var][sam]->GetBinContent(vars[var].nbins+1));
       
      
       nentries[sam] = histo[0][var][sam]->Integral(1,vars[var].nbins);
@@ -179,15 +179,15 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
         cmslabel = "";
       } else {
         //lumilabel = TString::Format("L = %1.f",luminosity.Atof()*1000.)+" pb^{-1} (13 TeV)";
-	lumilabel = TString::Format("#scale[0.8]{13 TeV}");
+        lumilabel = TString::Format("#scale[0.8]{13 TeV}");
         cmslabel = "#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}";
         if(CMStype=="Supplementary")cmslabel = "#scale[0.8]{#font[62]{CMS}} #scale[0.6]{#font[52]{Supplementary (Simulation)}}";
-	bool contains_data = false;
-	for(unsigned is=0;is<Samples.size();is++){if(Samples[is].isData){contains_data=true; break;} }
-	if(contains_data){ 
-	  cmslabel = "#font[62]{CMS}";
-	  cmslabel += " #scale[0.8]{#font[52]{"+CMStype+"}}";  
-	  lumilabel = TString::Format("%1.1f",luminosity.Atof())+" fb^{-1} (13 TeV)";}
+        bool contains_data = false;
+        for(unsigned is=0;is<Samples.size();is++){if(Samples[is].isData){contains_data=true; break;} }
+        if(contains_data){ 
+          cmslabel = "#font[62]{CMS}";
+          cmslabel += " #scale[0.8]{#font[52]{"+CMStype+"}}";  
+          lumilabel = TString::Format("%1.1f",luminosity.Atof())+" fb^{-1} (13 TeV)";}
       }
       if(vars[var].unit!="") {
         int digits(0);
@@ -215,21 +215,21 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
         int isam = vars[var].samples[sam];
         bool noStack = Samples[isam].isSig || Samples[isam].isData;
         if(!noStack){ // Adding previous bkg histos
-	  if(sam<last_hist) last_hist=sam;
+          if(sam<last_hist) last_hist=sam;
           for(unsigned bsam(sam+1); bsam < Nsam; bsam++){
             histo[0][var][sam]->Add(histo[0][var][bsam]);
             break;
           }
-	  histo[0][var][sam]->SetFillStyle(1001);
-	  if(Samples[isam].doBand){
-	    histo[0][var][sam]->SetFillColor(Samples[isam].color-12);
-	    histo[0][var][sam]->SetLineColor(Samples[isam].color);
-	    histo[0][var][sam]->SetLineWidth(3);
-	  } else {
-	    histo[0][var][sam]->SetFillColor(Samples[isam].color);
-	    histo[0][var][sam]->SetLineColor(1);
-	    histo[0][var][sam]->SetLineWidth(1);
-	  }
+          histo[0][var][sam]->SetFillStyle(1001);
+          if(Samples[isam].doBand){
+            histo[0][var][sam]->SetFillColor(Samples[isam].color-12);
+            histo[0][var][sam]->SetLineColor(Samples[isam].color);
+            histo[0][var][sam]->SetLineWidth(3);
+          } else {
+            histo[0][var][sam]->SetFillColor(Samples[isam].color);
+            histo[0][var][sam]->SetLineColor(1);
+            histo[0][var][sam]->SetLineWidth(1);
+          }
           bkgind = sam;
         } else {
           histo[0][var][sam]->SetLineColor(Samples[isam].color);
@@ -239,7 +239,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
             histo[0][var][sam]->SetLineWidth(2);
           } else {
             if(someBands) histo[0][var][sam]->SetLineWidth(3);
-	    else histo[0][var][sam]->SetLineWidth(6);
+            else histo[0][var][sam]->SetLineWidth(6);
             histo[0][var][sam]->SetLineStyle(abs(Samples[isam].style));
           }
           if(Samples[isam].doStack)  histo[0][var][sam]->Add(histo[0][var][bkgind]);
@@ -248,27 +248,27 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       }
       TString norm_s("");
       if(vars[var].normalize || doRatio){
-	double err_num(0), err_den(0);
-	float num = histo[0][var][0]->IntegralAndError(1,histo[0][var][0]->GetNbinsX(),err_num);
-	float den = histo[0][var][last_hist]->IntegralAndError(1,histo[0][var][last_hist]->GetNbinsX(),err_den);
-	normalization_ratio = num/den; //I want this to crash if den=0
-	double err_tot(den/num*sqrt(pow(err_num/num,2)+pow(err_den/den,2)));
-	err_tot = num/den*sqrt(pow(err_num/num,2)+pow(err_den/den,2));
-	//cout<<"Histogram [MC] is ("<<RoundNumber((den/num-1)*100,1)
-	//    <<" +- "<<RoundNumber(err_tot*100,1)<<")% larger than markers [data]"<<endl; 
-	norm_s = ", ("+RoundNumber((num/den)*100,1)+"#pm"+RoundNumber(err_tot*100,1)+")%";
-	cout<<"Markers [data] are ("<<RoundNumber((num/den)*100,1)
-	    <<" +- "<<RoundNumber(err_tot*100,1)<<")% the histogram [MC]. Data yield is "<<num<<endl;
+        double err_num(0), err_den(0);
+        float num = histo[0][var][0]->IntegralAndError(1,histo[0][var][0]->GetNbinsX(),err_num);
+        float den = histo[0][var][last_hist]->IntegralAndError(1,histo[0][var][last_hist]->GetNbinsX(),err_den);
+        normalization_ratio = num/den; //I want this to crash if den=0
+        double err_tot(den/num*sqrt(pow(err_num/num,2)+pow(err_den/den,2)));
+        err_tot = num/den*sqrt(pow(err_num/num,2)+pow(err_den/den,2));
+        //cout<<"Histogram [MC] is ("<<RoundNumber((den/num-1)*100,1)
+        //    <<" +- "<<RoundNumber(err_tot*100,1)<<")% larger than markers [data]"<<endl; 
+        norm_s = ", ("+RoundNumber((num/den)*100,1)+"#pm"+RoundNumber(err_tot*100,1)+")%";
+        cout<<"Markers [data] are ("<<RoundNumber((num/den)*100,1)
+            <<" +- "<<RoundNumber(err_tot*100,1)<<")% the histogram [MC]. Data yield is "<<num<<endl;
       }
       
       for(unsigned sam(Nsam-1); sam < Nsam; sam--){
-	int isam = vars[var].samples[sam];
-	//bool noStack = Samples[isam].isSig || Samples[isam].isData;
-	if(sam>=last_hist && vars[var].normalize && !Samples[isam].isSig){ 
-	  histo[0][var][sam]->Scale(normalization_ratio); 
-	  nentries[sam]*= normalization_ratio;
-	}
-	
+        int isam = vars[var].samples[sam];
+        //bool noStack = Samples[isam].isSig || Samples[isam].isData;
+        if(sam>=last_hist && vars[var].normalize && !Samples[isam].isSig){ 
+          histo[0][var][sam]->Scale(normalization_ratio); 
+          nentries[sam]*= normalization_ratio;
+        }
+        
         if(Samples[isam].mcerr){ histo[0][var][sam]->SetLineWidth(4);  histo[0][var][sam]->SetMarkerStyle(20); 
           //histo[0][var][sam]->SetMarkerColor(Samples[isam].color);
           histo[0][var][sam]->SetMarkerSize(1.2);
@@ -277,8 +277,8 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
         }
         double maxval(histo[0][var][sam]->GetMaximum());
         if(maxhisto < maxval)  maxhisto = maxval;
-	maxval += histo[0][var][sam]->GetBinErrorUp(histo[0][var][sam]->GetMaximumBin());
-	if((Samples[isam].isData || Samples[isam].mcerr) && maxhisto < maxval) maxhisto = maxval;
+        maxval += histo[0][var][sam]->GetBinErrorUp(histo[0][var][sam]->GetMaximumBin());
+        if((Samples[isam].isData || Samples[isam].mcerr) && maxhisto < maxval) maxhisto = maxval;
       }
 
 
@@ -296,20 +296,20 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
         unsigned ileg = (Nsam<=3?0:legcount>=(Nsam+1)/2);
         if(!noStack){
           if(Samples[isam].doBand) leg[ileg].AddEntry(histo[0][var][sam], leghisto,"fl");
-	  else leg[ileg].AddEntry(histo[0][var][sam], leghisto,"f");
+          else leg[ileg].AddEntry(histo[0][var][sam], leghisto,"f");
           legcount++;
           if(firstplotted < 0) {
             if(!Samples[isam].mcerr) {
-	      if(!Samples[isam].doBand) histo[0][var][sam]->Draw("hist");
-	      else {
-		histo[0][var][sam]->Draw("E2");
-		TString hcname("hclone"); hcname += var;
-		TH1F *hclone = static_cast<TH1F*>(histo[0][var][sam]->Clone(hcname));
-		hclone->SetLineColor(Samples[isam].color);
-		hclone->SetLineWidth(3);
-		hclone->SetFillColor(0);
-		hclone->Draw("hist same");
-	      }
+              if(!Samples[isam].doBand) histo[0][var][sam]->Draw("hist");
+              else {
+                histo[0][var][sam]->Draw("E2");
+                TString hcname("hclone"); hcname += var;
+                TH1F *hclone = static_cast<TH1F*>(histo[0][var][sam]->Clone(hcname));
+                hclone->SetLineColor(Samples[isam].color);
+                hclone->SetLineWidth(3);
+                hclone->SetFillColor(0);
+                hclone->Draw("hist same");
+              }
             } else histo[0][var][sam]->Draw("E0LP");
             firstplotted = sam;
             style.setTitles(histo[0][var][sam],vars[var].title, ytitle, cmslabel, lumilabel);
@@ -356,8 +356,8 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
           }
         }        
         if (ndatasam) {
-	  float maxRatio = 1.9;
-	  if(vars[var].maxRatio > 0) maxRatio = vars[var].maxRatio;
+          float maxRatio = 1.9;
+          if(vars[var].maxRatio > 0) maxRatio = vars[var].maxRatio;
           hratio_data = static_cast<TH1D*>(hdata->Clone());
           hratio_data->SetTitle("");
           hratio_data->Divide(histo[0][var][firstplotted]);
@@ -365,11 +365,11 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
           hratio_data->GetXaxis()->SetLabelSize(style.LabelSize*2.2);
           hratio_data->GetYaxis()->SetLabelSize(style.LabelSize*2.1);
           hratio_data->GetYaxis()->SetTitle("Data / MC ");
-	  if(Nsam==2) {
-	    size_t idata = vars[var].samples[0];
-	    if(Samples[idata].label.Contains("2l")) hratio_data->GetYaxis()->SetTitle("2l / 1l");
-	    else hratio_data->GetYaxis()->SetTitle("high / low");
-	  }
+          if(Nsam==2) {
+            size_t idata = vars[var].samples[0];
+            if(Samples[idata].label.Contains("2l")) hratio_data->GetYaxis()->SetTitle("2l / 1l");
+            else hratio_data->GetYaxis()->SetTitle("high / low");
+          }
           hratio_data->GetXaxis()->SetTitle(histo[0][var][firstplotted]->GetXaxis()->GetTitle());
           hratio_data->GetYaxis()->SetTitleSize(style.TitleSize*3);
           hratio_data->GetYaxis()->SetTitleOffset(0.5); //can't use relative size, since somehow it changes between plots...
@@ -380,7 +380,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
           //line at 1
           bpad->cd();
           hratio_data->Draw("e0");
-	  //          for (int ko=0; ko< hratio_data->GetNbinsX(); ko++){
+          //          for (int ko=0; ko< hratio_data->GetNbinsX(); ko++){
           //  cout<<hratio_data->GetBinLowEdge(ko+1)<<" "<<(hratio_data->GetBinLowEdge(ko+1)+hratio_data->GetBinWidth(ko+1))
           //      <<hratio_data->GetBinContent(ko+1)<<std::endl;
           //}
@@ -398,19 +398,19 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       //label lumi
       pad->cd();
       if(!namestyle.Contains("CMSPaper") || showcuts) {
-	TString lumilbl = TString::Format("%1.1f",luminosity.Atof())+" fb^{-1}"+norm_s;
-	TLatex llbl;
-	llbl.SetTextSize(style.LegendSize*0.8); 
-	llbl.SetNDC(); llbl.SetTextAlign(33);
-	llbl.DrawLatex(1-style.PadRightMargin-0.02,leg[0].GetY1NDC()-0.02,lumilbl);
+        TString lumilbl = TString::Format("%1.1f",luminosity.Atof())+" fb^{-1}"+norm_s;
+        TLatex llbl;
+        llbl.SetTextSize(style.LegendSize*0.8); 
+        llbl.SetNDC(); llbl.SetTextAlign(33);
+        llbl.DrawLatex(1-style.PadRightMargin-0.02,leg[0].GetY1NDC()-0.02,lumilbl);
       }
       // label nb
       if(vars[var].tag.Contains("results") && vars[var].cuts.Contains("nbm")){
-	TLatex tla;
-	tla.SetTextSize(0.055);
-	tla.SetTextFont(42);
-	if(vars[var].cuts.Contains("nbm==1")) tla.DrawLatexNDC(0.73,0.64,"#font[62]{N_{b} = 1}");
-	if(vars[var].cuts.Contains("nbm>=2")) tla.DrawLatexNDC(0.73,0.64,"#font[62]{N_{b} #geq 2}");
+        TLatex tla;
+        tla.SetTextSize(0.055);
+        tla.SetTextFont(42);
+        if(vars[var].cuts.Contains("nbm==1")) tla.DrawLatexNDC(0.73,0.64,"#font[62]{N_{b} = 1}");
+        if(vars[var].cuts.Contains("nbm>=2")) tla.DrawLatexNDC(0.73,0.64,"#font[62]{N_{b} #geq 2}");
       }
 
       //save canvas
@@ -449,19 +449,21 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       if(maxhisto < histo[1][var][sam]->GetMaximum()) maxhisto = histo[1][var][sam]->GetMaximum();
       style.setTitles(histo[1][var][sam],vars[var].title, "", cmslabel, lumilabel);
       if(sam==0){
-	histo[1][var][sam]->SetXTitle(vars[var].title);
-	ytitle = "% events";
-	if(vars[var].unit!="") {
-	  int digits(0);
-	  float binwidth((vars[var].maxx-vars[var].minx)/static_cast<float>(vars[var].nbins));
-	  if(binwidth<1) digits = 1;
-	  if (!variableBins) ytitle += ("/("+RoundNumber(binwidth,digits) +" "+vars[var].unit+")");
-	}	
+        histo[1][var][sam]->SetXTitle(vars[var].title);
+        ytitle = "% events";
+        if(vars[var].unit!="") {
+          int digits(0);
+          float binwidth((vars[var].maxx-vars[var].minx)/static_cast<float>(vars[var].nbins));
+          if(binwidth<1) digits = 1;
+          if (!variableBins) ytitle += ("/("+RoundNumber(binwidth,digits) +" "+vars[var].unit+")");
+        }       
         histo[1][var][sam]->SetYTitle(ytitle);
         if(Samples[isam].style>0) histo[1][var][sam]->Draw("hist");
+        else if (Samples[isam].mcerr) histo[1][var][sam]->Draw("E0LP");
         else histo[1][var][sam]->Draw("e0 x0");
       } else {
         if(Samples[isam].style>0) histo[1][var][sam]->Draw("hist same");
+        else if (Samples[isam].mcerr) histo[1][var][sam]->Draw("E0LP");
         else histo[1][var][sam]->Draw("e0 x0 same");
       }
       leghisto = Samples[isam].label;
@@ -475,7 +477,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
         } else{
           leg[ileg].SetX1NDC(0.24); leg[ileg].SetX2NDC(0.7);
           leg[ileg].SetTextSize(0.75*style.LegendSize);
-	  if(vars[var].varname.Contains("tks")) leghisto +=  "[N_{tks} = " + RoundNumber(nentries[sam],1) + ", from N_{events} = "
+          if(vars[var].varname.Contains("tks")) leghisto +=  "[N_{tks} = " + RoundNumber(nentries[sam],1) + ", from N_{events} = "
             +RoundNumber(vars[var].nevents.at(sam),1)+"]";
         }
       }
@@ -529,16 +531,16 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
     for(unsigned his(0); his < 2; his++){
       for(unsigned sam(0); sam < vars[var].samples.size(); sam++)
         if(histo[his][var][sam]) {
-	  //cout<<"Deleting "<<histo[his][var][sam]->GetName()<<endl;
-	  delete histo[his][var][sam];
-	}
+          //cout<<"Deleting "<<histo[his][var][sam]->GetName()<<endl;
+          delete histo[his][var][sam];
+        }
     }
   }
 }
 
 // Right now you have to use full samples, i.e. cuts added to sfeats is ignored (e.g. ntruleps==1 for 1l ttbar)
 void plot_2D_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString luminosity,
-			   TString filetype, TString namestyle, TString dir){
+                           TString filetype, TString namestyle, TString dir){
 
   TString lumi_nodot = luminosity; lumi_nodot.ReplaceAll(".","p");
 
@@ -657,11 +659,11 @@ TString cuts2title(TString title){
   title.ReplaceAll("nvels==2&&nels>=1","N_{e}#geq1, n^{veto}_{e}=2");
   title.ReplaceAll("(nvmus>=2||nvels>=2)","n^{veto}_{lep} #geq 2"); 
   title.ReplaceAll("(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))>80&&(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))<100", 
-		   "80<m_{ll}<100");  
+                   "80<m_{ll}<100");  
   title.ReplaceAll("mumuv_m>80&&mumuv_m<100", 
-		   "80<m_{ll}<100");  
+                   "80<m_{ll}<100");  
   title.ReplaceAll("elelv_m>80&&elelv_m<100", 
-		   "80<m_{ll}<100");  
+                   "80<m_{ll}<100");  
   title.ReplaceAll("onht>350&&onmet>100&&","");
   title.ReplaceAll("jets_islep[0]==0","");
   title.ReplaceAll("(nels==0&&nmus==1)","N_{#mu}=1");
@@ -809,7 +811,7 @@ hfeats::hfeats(TString ivarname, int inbins, float iminx, float imaxx, vector<in
   if(!(ctitle.find("phi")==std::string::npos)) unit = "rad";
   }
 hfeats::hfeats(TString ivarnamex, TString ivarnamey, int inbinsx, float iminx, float imaxx, int inbinsy, float iminy, 
-	       float imaxy,  vector<int> isamples,
+               float imaxy,  vector<int> isamples,
                TString ititlex, TString ititley, TString icuts, float icutx, float icuty, TString itagname):
   titlex(ititlex),
   titley(ititley),
@@ -1044,7 +1046,7 @@ void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &p
 }
 
 vector<double> getYields(baby_full &baby, bcut baseline, vector<bcut> bincuts, 
-                         vector<double> &yield, vector<double> &w2, double lumi, bool do_trig){
+                         vector<double> &yield, vector<double> &w2, double lumi, bool do_trig, vector<bool> do_sbd){
   vector<double> entries = vector<double>(bincuts.size(), 0);
   yield = vector<double>(bincuts.size(), 0);
   w2 = yield;
@@ -1056,13 +1058,13 @@ vector<double> getYields(baby_full &baby, bcut baseline, vector<bcut> bincuts,
       if(!baby.trig()[4] && !baby.trig()[8]) continue;
     }
     if(!baseline.pass(&baby)) continue;
-    for(size_t ind(0); ind<bincuts.size(); ind++){ 
-      if(bincuts[ind].pass(&baby)) {
-        entries[ind]++;
-        float wgt(bincuts[ind].weight(&baby));
-        yield[ind] += wgt;
-        w2[ind] += wgt*wgt;
-      }
+    for(size_t ind(0); ind<bincuts.size(); ind++){       
+      if(!bincuts[ind].pass(&baby)) continue;      
+      if (do_sbd[ind] && (baby.hig_am()>100 && baby.hig_am()<140 && baby.hig_dm()<40)) continue;
+      entries[ind]++;
+      float wgt(bincuts[ind].weight(&baby));
+      yield[ind] += wgt;
+      w2[ind] += wgt*wgt;
     }
   } // Loop over entries
   for(size_t ind(0); ind<bincuts.size(); ind++){ 

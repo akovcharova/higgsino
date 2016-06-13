@@ -103,7 +103,7 @@ void calc_chi2(TH1D *histo, float &chi2, int &ndof, float &pvalue, float &averag
 void dump_event(baby_full &tree, int entry);
 
 std::vector<double> getYields(baby_full &baby, bcut baseline, std::vector<bcut> bincuts, std::vector<double> &yields, 
-            std::vector<double> &w2, double lumi=1., bool do_trig=false);
+            std::vector<double> &w2, double lumi=1., bool do_trig=false, std::vector<bool> do_sbd = std::vector<bool>({false}));
 std::vector<std::vector<double> > getYields(baby_full &baby, bcut baseline, std::vector<std::vector<bcut> > bincuts, 
               std::vector<std::vector<double> > &yields, 
               std::vector<std::vector<double> > &w2, double lumi=1., bool do_trig=false);

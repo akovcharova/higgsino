@@ -29,6 +29,7 @@ bin/*
 *#
 
 # Other
+*.backup
 *.root
 *.log
 *.pdf
