@@ -14,8 +14,8 @@ namespace {
   TString plot_style="RA4";
   //options: ttbar, other, all_but_qcd, all
   TString sample_set = "ttbar";
-  TString nb_bins = "TML";
-  bool loose = true; //remove iso track vero, dr_max (skim still has 2.5), low_dphi
+  TString nb_bins = "TTML";
+  bool loose = false; //remove iso track vero, dr_max (skim still has 2.5), low_dphi
 }
 
 using namespace std;
@@ -30,6 +30,7 @@ int main(){
     bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
   
   TString folder(bfolder+"/cms2r0/babymaker/babies/2016_04_29/mc/merged_higloose/");
+  if (loose) folder.ReplaceAll("merged_higloose","merged_met100nb2nj4nl0");
 
   vector<TString> smpl;
   if (sample_set=="ttbar" || sample_set=="all_but_qcd" || sample_set=="all") {
@@ -58,12 +59,12 @@ int main(){
   // TString sbdcut="sbd";
   TString cut2b="nbt==2&&nbm==2", cut3b="nbt>=2&&nbm==3&&nbl==3", cut4b="nbt>=2&&nbm>=3&&nbl>=4";
   
-  if(nb_bins=="TTL"){
+  if(nb_bins=="TTTL"){
     cut2b = "nbt==2";
     cut3b = "nbt==3&&nbl==3";
     cut4b = "nbt==3&&nbl>=4";
   }
-  if(nb_bins=="MMM"){
+  if(nb_bins=="MMMM"){
     cut2b = "nbm==2";
     cut3b = "nbm==3";
     cut4b = "nbm>=4";
@@ -77,15 +78,14 @@ int main(){
   vector<sfeats> Samples; 
   TString label = "t#bar{t}";
   if (sample_set=="all") label = "Bkgd";
-  if (sample_set=="all_but_qcd") label = "Bkgd (w/o QCD)";
+  if (sample_set=="all_but_qcd") label = "Bkgd (w/o QCD)"; 
   if (sample_set=="other") label = "Other (w/o QCD)";
-  Samples.push_back(sfeats(smpl, label+", N_{b}=2", kAzure,1, "stitch&&pass&&"+cut2b));
-  if (loose) {
-    Samples.push_back(sfeats(smpl, label+", N_{b}#geq3", kRed+1,1, "stitch&&pass&&"+cut3b));
-  } else {
-    Samples.push_back(sfeats(smpl, label+", N_{b}=3", kGreen+1,1, "stitch&&pass&&"+cut3b));
-    Samples.push_back(sfeats(smpl, label+", N_{b}=4", kOrange,1, "stitch&&pass&&"+cut4b)); Samples.back().mcerr = true;
-  }
+  Samples.push_back(sfeats(smpl, label+", N_{b}=2", kGreen+1,1, "stitch&&pass&&"+cut2b));
+  Samples.push_back(sfeats(smpl, label+", N_{b}=3", kAzure-3,1, "stitch&&pass&&"+cut3b)); 
+  Samples.back().mcerr = true;
+  Samples.push_back(sfeats(smpl, label+", N_{b}=4", kRed-4,1, "stitch&&pass&&"+cut4b)); 
+  Samples.back().mcerr = true;
+  Samples.back().style = 2;
 
   vector<int> ra2b_sam;
   unsigned nsam(Samples.size());
@@ -97,9 +97,10 @@ int main(){
   TString tag = sample_set+"_"+nb_bins;
   if (loose) tag += "_loose";
   for (size_t imet(0); imet < metbins.size(); imet++){
-    vars.push_back(hfeats("hig_dm",32,0,160,ra2b_sam, "#Deltam [GeV]",baseline+"&&"+metbins[imet],40, tag));
+    float coarse = (imet==metbins.size()-1) ? 2:1;
+    vars.push_back(hfeats("hig_dm",32/coarse,0,160,ra2b_sam, "#Deltam [GeV]",baseline+"&&"+metbins[imet],40, tag));
     vars.back().whichPlots = "34"; 
-    vars.push_back(hfeats("hig_am",25,0,250,ra2b_sam, "<m> [GeV]",baseline+"&&"+metbins[imet], 100, tag));
+    vars.push_back(hfeats("hig_am",24/coarse,0,240,ra2b_sam, "<m> [GeV]",baseline+"&&"+metbins[imet], 100, tag));
     vars.back().whichPlots = "34"; vars.back().cut2 = 140;
     // vars.push_back(hfeats("hig_drmax",20,0,4,ra2b_sam, "#DeltaR_{max}",baseline+"&&"+metbins[imet],2.2, tag));
     // vars.back().whichPlots = "34"; 

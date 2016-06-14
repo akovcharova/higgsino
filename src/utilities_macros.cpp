@@ -458,12 +458,12 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
           if (!variableBins) ytitle += ("/("+RoundNumber(binwidth,digits) +" "+vars[var].unit+")");
         }       
         histo[1][var][sam]->SetYTitle(ytitle);
-        if(Samples[isam].style>0) histo[1][var][sam]->Draw("hist");
-        else if (Samples[isam].mcerr) histo[1][var][sam]->Draw("E0LP");
+        if (Samples[isam].mcerr) histo[1][var][sam]->Draw("E0LP");
+        else if(Samples[isam].style>0) histo[1][var][sam]->Draw("hist");
         else histo[1][var][sam]->Draw("e0 x0");
       } else {
-        if(Samples[isam].style>0) histo[1][var][sam]->Draw("hist same");
-        else if (Samples[isam].mcerr) histo[1][var][sam]->Draw("E0LP");
+        if (Samples[isam].mcerr) histo[1][var][sam]->Draw("E0LP same");
+        else if(Samples[isam].style>0) histo[1][var][sam]->Draw("hist same");
         else histo[1][var][sam]->Draw("e0 x0 same");
       }
       leghisto = Samples[isam].label;
@@ -1053,6 +1053,13 @@ vector<double> getYields(baby_full &baby, bcut baseline, vector<bcut> bincuts,
   long nentries(baby.GetEntries());
   for(long entry(0); entry < nentries; entry++){
     baby.GetEntry(entry);
+    //hacki-doodle
+    // unsigned ntrub(0), ntruc(0);
+    // for (unsigned ijet(0); ijet<baby.jets_hflavor().size(); ijet++){
+    //   if (baby.jets_hflavor()[ijet]==5) ntrub++;
+    //   if (baby.jets_hflavor()[ijet]==4) ntruc++;
+    // }
+    // if (ntrub!=2) continue;
     if(do_trig){
       if(!baby.pass()) continue;
       if(!baby.trig()[4] && !baby.trig()[8]) continue;

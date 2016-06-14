@@ -33,7 +33,8 @@ namespace{
   vector<TString> metlows = {"100","150","200","250"}; //low edge for each met bin
   //options: ttbar, all_but_qcd, all
   TString sample_set = "ttbar";
-  bool loose = true; //remove iso track vero, dr_max (skim still has 2.5), low_dphi
+  bool loose = false; 
+  TString hig_dm = "40";
   TString title_style("RA4"); //CMSPaper
 }
 
@@ -43,6 +44,7 @@ int main(){
   time_t begtime, endtime;
   time(&begtime);
   TString folder="/cms2r0/babymaker/babies/2016_04_29/mc/merged_higloose/";
+  if (loose) folder.ReplaceAll("merged_higloose","merged_met100nb2nj4nl0");
 
   ////// Creating babies
   baby_full tt(folder+"*TTJets*Lept*");
@@ -64,10 +66,15 @@ int main(){
   if (sample_set=="all") tt.Add(folder+"*_QCD_HT*");
   ////// Defining cuts
 
+  TString tag = "";
   TString baseline("pass&&stitch&&njets>=4&&njets<=5&&!low_dphi&&hig_drmax<2.2&&ntks==0");  
-  if (loose) baseline = "pass&&stitch&&njets>=4&&njets<=5&&hig_drmax<2.5";  
+  if (loose) {
+    baseline = "pass&&stitch&&njets>=4&&njets<=5&&hig_drmax<2.5";  
+    tag +="_loose";    
+  }
 
-  TString sigcut="hig_am>100&&hig_am<140&&hig_dm<40";
+  if (hig_dm!="40") tag += "_higdm-"+hig_dm;
+  TString sigcut="hig_am>100&&hig_am<140&&hig_dm<"+hig_dm;
   TString sbdcut="sbd";
   TString cut2b="nbt==2&&nbm==2", cut3b="nbt>=2&&nbm==3&&nbl==3", cut4b="nbt>=2&&nbm>=3&&nbl>=4";
   
@@ -164,8 +171,7 @@ int main(){
   }
 
   ///// Printing table
-  TString outname = "txt/table_kappa_"+nb_bins+".tex";
-  if (loose) outname.ReplaceAll(".tex","_loose.tex");
+  TString outname = "txt/table_kappa_"+nb_bins+tag+".tex";
   ofstream out(outname);
 
   size_t digits(1);
@@ -236,7 +242,7 @@ int main(){
   TString stylename = "RA4";
   styles style(stylename);
   style.setDefaultStyle();
-  float max_axis(2.4);
+  float max_axis(1.5), min_axis(0.5);
   unsigned ntypes(abcdtypes.size());
   for(size_t imet(0); imet<metbins.size(); imet++){
     for(size_t itype(0); itype<ntypes; itype++){
@@ -261,6 +267,7 @@ int main(){
   histo.GetYaxis()->SetTitleSize(0.06);
   histo.SetYTitle(ytitle);
   histo.SetMaximum(max_axis);
+  histo.SetMinimum(min_axis);
   style.moveYAxisLabel(&histo, max_axis, false);
   histo.GetXaxis()->SetLabelOffset(0.007);
   double legX(style.PadLeftMargin+0.03), legY(0.895), legSingle = 0.052;
@@ -276,7 +283,7 @@ int main(){
   //---------------------------
   histo.Draw();
   vector<TGraphAsymmErrors*> graph;
-  int colors[] = {kGreen+1, kAzure+1, kOrange+7}, styles[] = {20, 21, 22, 23};
+  int colors[] = {kGreen+1, kAzure-3, kRed-4}, styles[] = {20, 21, 22, 23};
   for(unsigned itype(0); itype<ntypes; itype++){
     vector<float> vy, veyl, veyh, vx, vexl, vexh;
     for(size_t imet(0); imet<metbins.size(); imet++){
@@ -286,7 +293,7 @@ int main(){
     }
     graph.push_back(new TGraphAsymmErrors(metbins.size(), &(vx[0]), &(vy[0]), &(vexl[0]), &(vexh[0]), &(veyl[0]), &(veyh[0])));
     graph.back()->SetMarkerStyle(styles[itype]); graph.back()->SetMarkerSize(1.65);  graph.back()->SetLineWidth(2);
-    graph.back()->SetMarkerColor(colors[itype]); graph.back()->SetLineColor(colors[itype]);
+    graph.back()->SetMarkerColor(colors[itype+1]); graph.back()->SetLineColor(colors[itype+1]);
     graph.back()->Draw("p same");   
     leg.AddEntry(graph.back(), abcdnames[itype], "p");
   }
@@ -296,8 +303,7 @@ int main(){
   TLine line; line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
   line.DrawLine(minh, 1, maxh, 1);
 
-  TString pname = "plots/kappa_"+nb_bins+"_"+sample_set+".pdf";
-  if (loose) pname.ReplaceAll(".pdf","_loose.pdf");
+  TString pname = "plots/kappa_"+nb_bins+"_"+sample_set+tag+".pdf";
   can.SaveAs(pname);
   cout<<endl<<" open "<<pname<<endl<<endl;
 
@@ -305,7 +311,7 @@ int main(){
   //---------------------------
   unsigned nnb(nbnames.size());
   //recalculate maximum
-  float min_axis = 0.15; max_axis = 0.55; 
+  min_axis = 0.15; max_axis = 0.55; 
   for(size_t imet(0); imet<metbins.size(); imet++){
     for(size_t inb(0); inb<nnb; inb++){
       size_t ind(nnb*imet+inb);
@@ -336,8 +342,7 @@ int main(){
   leg.Draw();
   line.DrawLine(minh, 1, maxh, 1);
 
-  pname = "plots/rss_"+nb_bins+"_"+sample_set+".pdf";
-  if (loose) pname.ReplaceAll(".pdf","_loose.pdf");
+  pname = "plots/rss_"+nb_bins+"_"+sample_set+tag+".pdf";
   can.SaveAs(pname);
   cout<<endl<<" open "<<pname<<endl<<endl;
 
